@@ -16,8 +16,6 @@
  */
 package org.whispersystems.textsecure.api.crypto;
 
-import android.util.Log;
-
 import org.whispersystems.libaxolotl.InvalidMacException;
 import org.whispersystems.libaxolotl.InvalidMessageException;
 import org.whispersystems.textsecure.internal.util.Util;
@@ -103,21 +101,32 @@ public class AttachmentCipherInputStream extends FileInputStream {
     else                                 return -1;
   }
 
+  @Override
+  public boolean markSupported() {
+    return false;
+  }
+
+  @Override
+  public long skip(long byteCount) throws IOException {
+    long skipped = 0L;
+    while (skipped < byteCount) {
+      byte[] buf  = new byte[Math.min(4096, (int)(byteCount-skipped))];
+      int    read = read(buf);
+
+      skipped += read;
+    }
+
+    return skipped;
+  }
+
   private int readFinal(byte[] buffer, int offset, int length) throws IOException {
     try {
       int flourish = cipher.doFinal(buffer, offset);
 
       done = true;
       return flourish;
-    } catch (IllegalBlockSizeException e) {
-      Log.w("EncryptingPartInputStream", e);
-      throw new IOException("Illegal block size exception!");
-    } catch (ShortBufferException e) {
-      Log.w("EncryptingPartInputStream", e);
-      throw new IOException("Short buffer exception!");
-    } catch (BadPaddingException e) {
-      Log.w("EncryptingPartInputStream", e);
-      throw new IOException("Bad padding exception!");
+    } catch (IllegalBlockSizeException | BadPaddingException | ShortBufferException e) {
+      throw new IOException(e);
     }
   }
 

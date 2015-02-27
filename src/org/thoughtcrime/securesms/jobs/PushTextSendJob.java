@@ -41,7 +41,7 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
   private final long messageId;
 
   public PushTextSendJob(Context context, long messageId, String destination) {
-    super(context, constructParameters(context, destination));
+    super(context, constructParameters(context, destination, false));
     this.messageId = messageId;
   }
 
@@ -51,7 +51,7 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
   }
 
   @Override
-  public void onRun(MasterSecret masterSecret) throws NoSuchMessageException, RetryLaterException {
+  public void onSend(MasterSecret masterSecret) throws NoSuchMessageException, RetryLaterException {
     EncryptingSmsDatabase database     = DatabaseFactory.getEncryptingSmsDatabase(context);
     SmsMessageRecord      record       = database.getMessage(masterSecret, messageId);
     String                destination  = record.getIndividualRecipient().getNumber();
@@ -59,11 +59,11 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
     try {
       Log.w(TAG, "Sending message: " + messageId);
 
-      deliver(masterSecret, record, destination);
-
-      database.markAsPush(messageId);
-      database.markAsSecure(messageId);
-      database.markAsSent(messageId);
+      if (deliver(masterSecret, record, destination)) {
+        database.markAsPush(messageId);
+        database.markAsSecure(messageId);
+        database.markAsSent(messageId);
+      }
     } catch (InsecureFallbackApprovalException e) {
       Log.w(TAG, e);
       database.markAsPendingInsecureSmsFallback(record.getId());
@@ -97,11 +97,11 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
     MessageNotifier.notifyMessageDeliveryFailed(context, recipients, threadId);
   }
 
-  private void deliver(MasterSecret masterSecret, SmsMessageRecord message, String destination)
+  private boolean deliver(MasterSecret masterSecret, SmsMessageRecord message, String destination)
       throws UntrustedIdentityException, SecureFallbackApprovalException,
              InsecureFallbackApprovalException, RetryLaterException
   {
-    boolean isSmsFallbackSupported = isSmsFallbackSupported(context, destination);
+    boolean isSmsFallbackSupported = isSmsFallbackSupported(context, destination, false);
 
     try {
       PushAddress             address       = getPushAddress(message.getIndividualRecipient());
@@ -114,6 +114,8 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
         messageSender.sendMessage(address, new TextSecureMessage(message.getDateSent(), null,
                                                                  message.getBody().getBody()));
       }
+
+      return true;
     } catch (InvalidNumberException | UnregisteredUserException e) {
       Log.w(TAG, e);
       if (isSmsFallbackSupported) fallbackOrAskApproval(masterSecret, message, destination);
@@ -123,13 +125,15 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
       if (isSmsFallbackSupported) fallbackOrAskApproval(masterSecret, message, destination);
       else                        throw new RetryLaterException(e);
     }
+
+    return false;
   }
 
   private void fallbackOrAskApproval(MasterSecret masterSecret, SmsMessageRecord smsMessage, String destination)
       throws SecureFallbackApprovalException, InsecureFallbackApprovalException
   {
     Recipient    recipient                     = smsMessage.getIndividualRecipient();
-    boolean      isSmsFallbackApprovalRequired = isSmsFallbackApprovalRequired(destination);
+    boolean      isSmsFallbackApprovalRequired = isSmsFallbackApprovalRequired(destination, false);
     AxolotlStore axolotlStore                  = new TextSecureAxolotlStore(context, masterSecret);
 
     if (!isSmsFallbackApprovalRequired) {

@@ -17,7 +17,11 @@ The following steps should help you (re)build TextSecure from the command line.
         git clone https://github.com/WhisperSystems/TextSecure.git
 
 2. Make sure you have the [Android SDK](https://developer.android.com/sdk/index.html) installed somewhere on your system.
-3. Ensure the "Android Support Repository" and "Android SDK Build-tools" are installed from the Android SDK manager.
+3. Ensure that the following packages are installed from the Android SDK manager:
+    * Android SDK Build Tools
+    * SDK Platform
+    * Android Support Repository
+    * Google Repository
 4. Create a local.properties file at the root of your source checkout and add an sdk.dir entry to it.
 
         sdk.dir=\<path to your sdk installation\>
@@ -25,20 +29,6 @@ The following steps should help you (re)build TextSecure from the command line.
 5. Execute Gradle:
 
         ./gradlew build
-
-Re-building native components
------------------------------
-
-Note: This step is optional; native components are contained as binaries (see [library/libs](library/libs)).
-
-1. Ensure that the Android NDK is installed.
-
-Execute ndk-build:
-
-    cd library
-    ndk-build
-
-Afterwards, execute Gradle as above to re-create the APK.
 
 Setting up a development environment
 ------------------------------------

@@ -16,6 +16,7 @@
       <item>Français</item>
       <item>Greek ελληνικά</item>
       <item>Hebrew עברית</item>
+      <item>Hrvatski</item>
       <item>Indonesia</item>
       <item>Italiano</item>
       <item>Japanese 日本人</item>
@@ -28,6 +29,7 @@
       <item>Português do Brasil</item>
       <item>Român</item>
       <item>Russian Pусский</item>
+      <item>Serbian српски</item>
       <item>Slovenščina</item>
       <item>Slovenský</item>
       <item>Suomi</item>
@@ -36,6 +38,20 @@
       <item>Türkçe</item>
       <item>Ukrainian Український</item>
   </string-array>
+
+  <array name="avatar_colors">
+    <item>#6dcaec</item>
+    <item>#cf9fe7</item>
+    <item>#b6db49</item>
+    <item>#ffd060</item>
+    <item>#ff7979</item>
+
+    <item>#2cb1e1</item>
+    <item>#c182e0</item>
+    <item>#92c500</item>
+    <item>#ffb61c</item>
+    <item>#f83a3a</item>
+  </array>
 
   <string-array name="language_values">
       <item>zz</item>
@@ -52,11 +68,12 @@
       <item>fr</item>
       <item>el</item>
       <item>he</item>
+      <item>hr</item>
       <item>id</item>
       <item>it</item>
       <item>ja</item>
       <item>kn_IN</item>
-      <item>he</item>
+      <item>hu</item>
       <item>nl</item>
       <item>no</item>
       <item>pl</item>
@@ -64,6 +81,7 @@
       <item>pt_BR</item>
       <item>ro</item>
       <item>ru</item>
+      <item>sr</item>
       <item>sl</item>
       <item>sk</item>
       <item>fi</item>
@@ -123,5 +141,65 @@
     <item>500,2000</item>
     <item>3000,3000</item>
     <item>custom</item>
+  </string-array>
+
+  <string-array name="transport_selection_entries_text">
+    <item>@string/ConversationActivity_transport_insecure_sms</item>
+    <item>@string/ConversationActivity_transport_secure_sms</item>
+    <item>@string/ConversationActivity_transport_textsecure</item>
+  </string-array>
+
+  <string-array name="transport_selection_entries_media">
+    <item>@string/ConversationActivity_transport_insecure_mms</item>
+    <item>@string/ConversationActivity_transport_secure_mms</item>
+    <item>@string/ConversationActivity_transport_textsecure</item>
+  </string-array>
+
+  <string-array name="transport_selection_entries_compose_text">
+    <item>@string/conversation_activity__type_message_sms_insecure</item>
+    <item>@string/conversation_activity__type_message_sms_secure</item>
+    <item>@string/conversation_activity__type_message_push</item>
+  </string-array>
+
+  <string-array name="transport_selection_entries_compose_media">
+    <item>@string/conversation_activity__type_message_mms_insecure</item>
+    <item>@string/conversation_activity__type_message_mms_secure</item>
+    <item>@string/conversation_activity__type_message_push</item>
+  </string-array>
+
+  <string-array name="transport_selection_values">
+    <item>insecure_sms</item>
+    <item>secure_sms</item>
+    <item>textsecure</item>
+  </string-array>
+
+  <string-array name="transport_selection_icons_light">
+    <item>@drawable/ic_send_sms_insecure</item>
+    <item>@drawable/ic_send_sms_secure</item>
+    <item>@drawable/ic_send_push</item>
+  </string-array>
+
+  <string-array name="transport_selection_icons_dark">
+    <item>@drawable/ic_send_sms_insecure_dark</item>
+    <item>@drawable/ic_send_sms_secure</item>
+    <item>@drawable/ic_send_push</item>
+  </string-array>
+
+  <string-array name="pref_repeat_alerts_entries">
+      <item>Never</item>
+      <item>One time</item>
+      <item>Two times</item>
+      <item>Three times</item>
+      <item>Five times</item>
+      <item>Ten times</item>
+  </string-array>
+
+  <string-array name="pref_repeat_alerts_values" translatable="false">
+      <item>0</item>
+      <item>1</item>
+      <item>2</item>
+      <item>3</item>
+      <item>5</item>
+      <item>10</item>
   </string-array>
 </resources>

@@ -129,7 +129,7 @@ public class RoutingActivity extends PassphraseRequiredActionBarActivity {
 
   private Intent getConversationIntent(ConversationParameters parameters) {
     Intent intent = new Intent(this, ConversationActivity.class);
-    intent.putExtra(ConversationActivity.RECIPIENTS_EXTRA, parameters.recipients != null ? parameters.recipients.toIdString() : "");
+    intent.putExtra(ConversationActivity.RECIPIENTS_EXTRA, parameters.recipients != null ? parameters.recipients.getIds() : new long[]{});
     intent.putExtra(ConversationActivity.THREAD_ID_EXTRA, parameters.thread);
     intent.putExtra(ConversationActivity.MASTER_SECRET_EXTRA, masterSecret);
     intent.putExtra(ConversationActivity.DRAFT_TEXT_EXTRA, parameters.draftText);
@@ -196,7 +196,8 @@ public class RoutingActivity extends PassphraseRequiredActionBarActivity {
 
   private ConversationParameters getConversationParametersForSendAction() {
     Recipients recipients;
-    long       threadId = getIntent().getLongExtra("thread_id", -1);
+    String body     = getIntent().getStringExtra("sms_body");
+    long   threadId = getIntent().getLongExtra("thread_id", -1);
 
     try {
       String data = getIntent().getData().getSchemeSpecificPart();
@@ -206,7 +207,7 @@ public class RoutingActivity extends PassphraseRequiredActionBarActivity {
       recipients = null;
     }
 
-    return new ConversationParameters(threadId, recipients, null, null, null, null);
+    return new ConversationParameters(threadId, recipients, body, null, null, null);
   }
 
   private ConversationParameters getConversationParametersForShareAction() {
@@ -245,8 +246,9 @@ public class RoutingActivity extends PassphraseRequiredActionBarActivity {
   }
 
   private ConversationParameters getConversationParametersForInternalAction() {
-    long threadId         = getIntent().getLongExtra("thread_id", -1);
-    Recipients recipients = getIntent().getParcelableExtra("recipients");
+    long   threadId       = getIntent().getLongExtra("thread_id", -1);
+    long[] recipientIds   = getIntent().getLongArrayExtra("recipients");
+    Recipients recipients = recipientIds == null ? null : RecipientFactory.getRecipientsForIds(this, recipientIds, true);
 
     return new ConversationParameters(threadId, recipients, null, null, null, null);
   }

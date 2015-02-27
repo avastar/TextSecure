@@ -16,27 +16,37 @@
  */
 package org.whispersystems.textsecure.api;
 
+import com.google.protobuf.ByteString;
+
 import org.whispersystems.libaxolotl.IdentityKey;
+import org.whispersystems.libaxolotl.IdentityKeyPair;
+import org.whispersystems.libaxolotl.InvalidKeyException;
+import org.whispersystems.libaxolotl.ecc.ECPublicKey;
 import org.whispersystems.libaxolotl.state.PreKeyRecord;
 import org.whispersystems.libaxolotl.state.SignedPreKeyRecord;
 import org.whispersystems.libaxolotl.util.guava.Optional;
 import org.whispersystems.textsecure.api.push.ContactTokenDetails;
-import org.whispersystems.textsecure.api.push.TrustStore;
-import org.whispersystems.textsecure.internal.push.PushServiceSocket;
 import org.whispersystems.textsecure.api.push.SignedPreKeyEntity;
+import org.whispersystems.textsecure.api.push.TrustStore;
+import org.whispersystems.textsecure.internal.crypto.ProvisioningCipher;
+import org.whispersystems.textsecure.internal.push.PushServiceSocket;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import static org.whispersystems.textsecure.internal.push.ProvisioningProtos.ProvisionMessage;
+
 public class TextSecureAccountManager {
 
   private final PushServiceSocket pushServiceSocket;
+  private final String            user;
 
   public TextSecureAccountManager(String url, TrustStore trustStore,
                                   String user, String password)
   {
     this.pushServiceSocket = new PushServiceSocket(url, trustStore, user, password);
+    this.user              = user;
   }
 
   public void setGcmId(Optional<String> gcmRegistrationId) throws IOException {
@@ -86,8 +96,32 @@ public class TextSecureAccountManager {
     return Optional.fromNullable(this.pushServiceSocket.getContactTokenDetails(contactToken));
   }
 
-  public List<ContactTokenDetails> getContacts(Set<String> contactTokens) {
+  public List<ContactTokenDetails> getContacts(Set<String> contactTokens)
+      throws IOException
+  {
     return this.pushServiceSocket.retrieveDirectory(contactTokens);
+  }
+
+  public String getNewDeviceVerificationCode() throws IOException {
+    return this.pushServiceSocket.getNewDeviceVerificationCode();
+  }
+
+  public void addDevice(String deviceIdentifier,
+                        ECPublicKey deviceKey,
+                        IdentityKeyPair identityKeyPair,
+                        String code)
+      throws InvalidKeyException, IOException
+  {
+    ProvisioningCipher cipher  = new ProvisioningCipher(deviceKey);
+    ProvisionMessage   message = ProvisionMessage.newBuilder()
+                                                 .setIdentityKeyPublic(ByteString.copyFrom(identityKeyPair.getPublicKey().serialize()))
+                                                 .setIdentityKeyPrivate(ByteString.copyFrom(identityKeyPair.getPrivateKey().serialize()))
+                                                 .setNumber(user)
+                                                 .setProvisioningCode(code)
+                                                 .build();
+
+    byte[] ciphertext = cipher.encrypt(message);
+    this.pushServiceSocket.sendProvisioningMessage(deviceIdentifier, ciphertext);
   }
 
 }

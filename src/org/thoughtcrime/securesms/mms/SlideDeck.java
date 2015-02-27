@@ -18,9 +18,9 @@ package org.thoughtcrime.securesms.mms;
 
 import android.content.Context;
 
+import org.thoughtcrime.securesms.crypto.MasterSecret;
 import org.thoughtcrime.securesms.dom.smil.parser.SmilXmlSerializer;
 import org.thoughtcrime.securesms.util.SmilUtil;
-import org.thoughtcrime.securesms.crypto.MasterSecret;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
@@ -64,7 +64,7 @@ public class SlideDeck {
   public void clear() {
     slides.clear();
   }
-	
+
   public PduBody toPduBody() {
     PduBody body = new PduBody();
 
@@ -87,7 +87,7 @@ public class SlideDeck {
   public void addSlide(Slide slide) {
     slides.add(slide);
   }
-	
+
   public List<Slide> getSlides() {
     return slides;
   }
@@ -101,5 +101,5 @@ public class SlideDeck {
 
     return false;
   }
-	
+
 }
