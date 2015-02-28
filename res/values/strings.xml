@@ -439,8 +439,8 @@
     <string name="change_passphrase_activity__old_passphrase">OLD PASSPHRASE:</string>
     <string name="change_passphrase_activity__new_passphrase">NEW PASSPHRASE:</string>
     <string name="change_passphrase_activity__repeat_new_passphrase">REPEAT NEW PASSPHRASE:</string>
-    <string name="change_passphrase_activity__new_duress">NEW DURESS:</string>
-    <string name="change_passphrase_activity__repeat_new_duress">REPEAT NEW DURESS:</string>
+    <string name="change_passphrase_activity__new_duress">DURESS:</string>
+    <string name="change_passphrase_activity__repeat_new_duress">REPEAT DURESS:</string>
 
     <!-- contact_selection_group_activity -->
     <!-- contact_selection_list_activity -->
@@ -648,6 +648,7 @@
     <string name="AndroidManifest__textsecure_detected">TextSecure detected</string>
     <string name="AndroidManifest__public_identity_key">Public identity key</string>
     <string name="AndroidManifest__change_passphrase">Change passphrase</string>
+    <string name="AndroidManifest__create_duress">Create Duress</string>
     <string name="AndroidManifest__verify_identity">Verify identity</string>
     <string name="AndroidManifest__complete_key_exchange">Complete key exchange</string>
     <string name="AndroidManifest__log_submit">Submit debug logs</string>
@@ -757,6 +758,8 @@
     </string>
     <string name="preferences__sms_fallback">Outgoing SMS/MMS</string>
     <string name="preferences__submit_debug_log">Submit debug log</string>
+    <string name="preferences__create_duress">Create Duress passphrase</string>
+    <string name="preferences__create_duress_summary">Initializes a passphrase which destroys all encrypted and mms texts</string>
     <string name="preferences__sms_outgoing_push_users">TextSecure users</string>
     <string name="preferences__sms_fallback_push_users_ask">ask first</string>
     <string name="preferences__sms_fallback_push_users_no_mms">no MMS</string>

@@ -37,12 +37,11 @@ import org.thoughtcrime.securesms.util.TextSecurePreferences;
  * @author Moxie Marlinspike
  */
 
-public class PassphraseChangeActivity extends PassphraseActivity {
+public class DuressCreateActivity extends PassphraseActivity {
 
-  private EditText originalPassphrase;
-  private EditText newPassphrase;
-  private EditText repeatPassphrase;
-  private TextView originalPassphraseLabel;
+  private EditText passphrase;
+  private EditText duress;
+  private EditText repeatDuress;
   private Button   okButton;
   private Button   cancelButton;
 
@@ -50,67 +49,54 @@ public class PassphraseChangeActivity extends PassphraseActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    setContentView(R.layout.change_passphrase_activity);
+    setContentView(R.layout.create_duress_activity);
 
     initializeResources();
   }
 
   private void initializeResources() {
-    this.originalPassphraseLabel = (TextView) findViewById(R.id.old_passphrase_label);
-    this.originalPassphrase      = (EditText) findViewById(R.id.old_passphrase      );
-    this.newPassphrase           = (EditText) findViewById(R.id.new_passphrase      );
-    this.repeatPassphrase        = (EditText) findViewById(R.id.repeat_passphrase   );
+
+    this.passphrase              = (EditText) findViewById(R.id.passphrase      );
+    this.duress                  = (EditText) findViewById(R.id.duress          );
+    this.repeatDuress            = (EditText) findViewById(R.id.repeat_duress       );
 
     this.okButton                = (Button  ) findViewById(R.id.ok_button           );
     this.cancelButton            = (Button  ) findViewById(R.id.cancel_button       );
 
     this.okButton.setOnClickListener(new OkButtonClickListener());
     this.cancelButton.setOnClickListener(new CancelButtonClickListener());
-
-    if (TextSecurePreferences.isPasswordDisabled(this)) {
-      this.originalPassphrase.setVisibility(View.GONE);
-      this.originalPassphraseLabel.setVisibility(View.GONE);
-    } else {
-      this.originalPassphrase.setVisibility(View.VISIBLE);
-      this.originalPassphraseLabel.setVisibility(View.VISIBLE);
-    }
   }
 
   private void verifyAndSavePassphrases() {
-    Editable originalText = this.originalPassphrase.getText();
-    Editable newText      = this.newPassphrase.getText();
-    Editable repeatText   = this.repeatPassphrase.getText();
+    Editable originalText = this.passphrase.getText();
+    Editable newText      = this.duress.getText();
+    Editable repeatText   = this.repeatDuress.getText();
 
-    String original         = (originalText == null ? "" : originalText.toString());
-    String passphrase       = (newText == null ? "" : newText.toString());
-    String passphraseRepeat = (repeatText == null ? "" : repeatText.toString());
-
-    if (TextSecurePreferences.isPasswordDisabled(this)) {
-      original = MasterSecretUtil.UNENCRYPTED_PASSPHRASE;
-    }
+    String passphrase     = (originalText == null ? "" : originalText.toString());
+    String duress         = (newText == null ? "" : newText.toString());
+    String repeatDuress   = (repeatText == null ? "" : repeatText.toString());
 
     try {
-      if (!passphrase.equals(passphraseRepeat)) {
+      if (!duress.equals(repeatDuress)) {
         Toast.makeText(getApplicationContext(),
-                       R.string.PassphraseChangeActivity_passphrases_dont_match_exclamation,
-                       Toast.LENGTH_SHORT).show();
-        this.newPassphrase.setText("");
-        this.repeatPassphrase.setText("");
+              R.string.PassphraseChangeActivity_passphrases_dont_match_exclamation,
+              Toast.LENGTH_SHORT).show();
+        this.duress.setText("");
+        this.repeatDuress.setText("");
       } else {
-        MasterSecret masterSecret = MasterSecretUtil.changeMasterSecretPassphrase(this, original, passphrase);
+        MasterSecret masterSecret = MasterSecretUtil.getMasterSecret(this, passphrase);
+        MasterSecretUtil.generateMasterSecretDuress(this, duress, masterSecret);
 
-        TextSecurePreferences.setPasswordDisabled(this, false);
-
-        MemoryCleaner.clean(original);
         MemoryCleaner.clean(passphrase);
-        MemoryCleaner.clean(passphraseRepeat);
+        MemoryCleaner.clean(duress);
+        MemoryCleaner.clean(repeatDuress);
 
         setMasterSecret(masterSecret);
       }
     } catch (InvalidPassphraseException e) {
-      Toast.makeText(this, R.string.PassphraseChangeActivity_incorrect_old_passphrase_exclamation,
-                     Toast.LENGTH_LONG).show();
-      this.originalPassphrase.setText("");
+        Toast.makeText(this, R.string.PassphraseChangeActivity_incorrect_old_passphrase_exclamation,
+        Toast.LENGTH_LONG).show();
+        this.passphrase.setText("");
     }
   }
 
@@ -128,9 +114,9 @@ public class PassphraseChangeActivity extends PassphraseActivity {
 
   @Override
   protected void cleanup() {
-    this.originalPassphrase = null;
-    this.newPassphrase      = null;
-    this.repeatPassphrase   = null;
+    this.passphrase = null;
+    this.duress = null;
+    this.repeatDuress = null;
 
     System.gc();
   }

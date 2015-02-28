@@ -10,6 +10,7 @@ import android.support.v4.preference.PreferenceFragment;
 import android.util.Log;
 
 import org.thoughtcrime.securesms.ApplicationPreferencesActivity;
+import org.thoughtcrime.securesms.DuressCreateActivity;
 import org.thoughtcrime.securesms.LogSubmitActivity;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.contacts.ContactAccessor;
@@ -32,6 +33,9 @@ public class AdvancedPreferenceFragment extends PreferenceFragment {
 
     this.findPreference(SUBMIT_DEBUG_LOG_PREF)
       .setOnPreferenceClickListener(new SubmitDebugLogListener());
+
+    this.findPreference(TextSecurePreferences.SET_DURESS_PREF)
+      .setOnPreferenceClickListener(new SetDuressClickListener());
   }
 
   @Override
@@ -97,4 +101,13 @@ public class AdvancedPreferenceFragment extends PreferenceFragment {
       return true;
     }
   }
+
+  private class SetDuressClickListener implements Preference.OnPreferenceClickListener {
+    @Override
+    public boolean onPreferenceClick(Preference preference) {
+      startActivity(new Intent(getActivity(), DuressCreateActivity.class));
+      return true;
+    }
+  }
+
 }

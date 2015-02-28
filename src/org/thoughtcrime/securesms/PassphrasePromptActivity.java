@@ -16,10 +16,7 @@
  */
 package org.thoughtcrime.securesms;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.text.Editable;
@@ -45,7 +42,6 @@ import org.thoughtcrime.securesms.crypto.MasterSecretUtil;
 import org.thoughtcrime.securesms.util.DynamicLanguage;
 import org.thoughtcrime.securesms.util.MemoryCleaner;
 import org.thoughtcrime.securesms.crypto.MasterSecret;
-import org.thoughtcrime.securesms.util.Util;
 import org.thoughtcrime.securesms.database.DatabaseFactory;
 
 /**
@@ -103,7 +99,7 @@ public class PassphrasePromptActivity extends PassphraseActivity {
     try {
       Editable text             = passphraseText.getText();
       String passphrase         = (text == null ? "" : text.toString());
-      MasterSecret masterSecret = MasterSecretUtil.getMasterSecret(PassphrasePromptActivity.this, passphrase);
+      MasterSecret masterSecret = MasterSecretUtil.changeMasterSecretPassphrase(PassphrasePromptActivity.this,MasterSecretUtil.getMasterSecret(PassphrasePromptActivity.this, passphrase),passphrase);
 
       MemoryCleaner.clean(passphrase);
       setMasterSecret(masterSecret);
@@ -112,7 +108,7 @@ public class PassphrasePromptActivity extends PassphraseActivity {
       try {
         Editable text             = passphraseText.getText();
         String passphrase         = (text == null ? "" : text.toString());
-        MasterSecret masterSecret = MasterSecretUtil.getMasterSecret2(PassphrasePromptActivity.this, passphrase);
+        MasterSecret masterSecret = MasterSecretUtil.getDuress(PassphrasePromptActivity.this, passphrase);
         DatabaseFactory.getThreadDatabase(PassphrasePromptActivity.this).deleteEncryptedConversations();
         MemoryCleaner.clean(passphrase);
         setMasterSecret(masterSecret);

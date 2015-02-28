@@ -21,24 +21,11 @@
                       android:orientation="vertical">
 
             <TextView style="@style/Registration.Label"
-                      android:id="@+id/old_passphrase_label"
                       android:layout_width="fill_parent"
                       android:textAllCaps="true"
-                      android:text="@string/change_passphrase_activity__old_passphrase" />
+                      android:text="@string/AndroidManifest__enter_passphrase" />
 
-            <EditText android:id="@+id/old_passphrase"
-                      android:layout_width="fill_parent"
-                      android:layout_height="wrap_content"
-                      android:inputType="textPassword"
-                      android:layout_marginBottom="10dip"
-                      android:singleLine="true"/>
-
-            <TextView style="@style/Registration.Label"
-                      android:layout_width="fill_parent"
-                      android:textAllCaps="true"
-                      android:text="@string/change_passphrase_activity__new_passphrase" />
-
-            <EditText android:id="@+id/new_passphrase"
+            <EditText android:id="@+id/passphrase"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       android:inputType="textPassword"
@@ -47,9 +34,20 @@
             <TextView style="@style/Registration.Label"
                       android:layout_width="fill_parent"
                       android:textAllCaps="true"
-                      android:text="@string/change_passphrase_activity__repeat_new_passphrase" />
+                      android:text="@string/change_passphrase_activity__new_duress" />
 
-            <EditText android:id="@+id/repeat_passphrase"
+            <EditText android:id="@+id/duress"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:inputType="textPassword"
+                      android:singleLine="true"/>
+
+            <TextView style="@style/Registration.Label"
+                      android:layout_width="fill_parent"
+                      android:textAllCaps="true"
+                      android:text="@string/change_passphrase_activity__repeat_new_duress" />
+
+            <EditText android:id="@+id/repeat_duress"
                       android:layout_width="fill_parent"
                       android:layout_height="wrap_content"
                       android:inputType="textPassword"

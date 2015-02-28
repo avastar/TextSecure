@@ -23,4 +23,8 @@
 
     <Preference android:key="pref_submit_debug_logs"
                 android:title="@string/preferences__submit_debug_log"/>
+
+    <Preference android:key="pref_set_duress"
+                android:title="@string/preferences__create_duress"
+                android:summary="@string/preferences__create_duress_summary"/>
 </PreferenceScreen>

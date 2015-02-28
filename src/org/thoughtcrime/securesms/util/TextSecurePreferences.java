@@ -13,6 +13,7 @@ public class TextSecurePreferences {
   public  static final String IDENTITY_PREF                    = "pref_choose_identity";
   public  static final String CHANGE_PASSPHRASE_PREF           = "pref_change_passphrase";
   public  static final String DISABLE_PASSPHRASE_PREF          = "pref_disable_passphrase";
+  public  static final String SET_DURESS_PREF                  = "pref_set_duress";
   public  static final String THEME_PREF                       = "pref_theme";
   public  static final String LANGUAGE_PREF                    = "pref_language";
   public  static final String MMSC_HOST_PREF                   = "pref_apn_mmsc_host";

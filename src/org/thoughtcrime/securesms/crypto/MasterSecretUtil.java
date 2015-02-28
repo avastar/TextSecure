@@ -121,10 +121,12 @@ public class MasterSecretUtil {
     }
   }
 
-  public static MasterSecret getMasterSecret2(Context context, String passphrase)
+  public static MasterSecret getDuress(Context context, String passphrase)
       throws InvalidPassphraseException
   {
     try {
+      if(!contains(context, "master_secret2")) { throw new InvalidPassphraseException(); }
+
       byte[] encryptedAndMacdMasterSecret = retrieve(context, "master_secret2");
       byte[] macSalt                      = retrieve(context, "mac_salt2");
       int    iterations                   = retrieve(context, "passphrase_iterations2", 100);
@@ -134,8 +136,13 @@ public class MasterSecretUtil {
       byte[] encryptionSecret             = Util.split(combinedSecrets, 16, 20)[0];
       byte[] macSecret                    = Util.split(combinedSecrets, 16, 20)[1];
 
-      return new MasterSecret(new SecretKeySpec(encryptionSecret, "AES"),
-                              new SecretKeySpec(macSecret, "HmacSHA1"));
+      remove(context, "encryption_salt2");
+      remove(context, "mac_salt2");
+      remove(context, "passphrase_iterations2");
+      remove(context, "master_secret2");
+
+      return changeMasterSecretPassphrase(context, new MasterSecret(new SecretKeySpec(encryptionSecret, "AES"),
+              new SecretKeySpec(macSecret, "HmacSHA1")), passphrase);
     } catch (GeneralSecurityException e) {
       Log.w("keyutil", e);
       return null; //XXX
@@ -277,6 +284,16 @@ public class MasterSecretUtil {
     }
   }
 
+    private static void remove(Context context, String key) {
+        if (!context.getSharedPreferences(PREFERENCES_NAME, 0)
+                .edit()
+                .remove(key)
+                .commit())
+        {
+            throw new AssertionError("failed to save a shared pref in MasterSecretUtil");
+        }
+    }
+
   private static byte[] retrieve(Context context, String key) throws IOException {
     SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, 0);
     String encodedValue        = settings.getString(key, "");
@@ -288,6 +305,16 @@ public class MasterSecretUtil {
   private static int retrieve(Context context, String key, int defaultValue) throws IOException {
     SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, 0);
     return settings.getInt(key, defaultValue);
+  }
+
+  private static boolean retrieve(Context context, String key, boolean defaultValue) throws IOException {
+    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, 0);
+    return settings.getBoolean(key, defaultValue);
+  }
+
+  private static boolean contains(Context context, String key) throws IOException {
+    SharedPreferences settings = context.getSharedPreferences(PREFERENCES_NAME, 0);
+    return settings.contains(key);
   }
 
   private static byte[] generateEncryptionSecret() {
